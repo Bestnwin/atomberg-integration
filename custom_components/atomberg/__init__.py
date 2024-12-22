@@ -40,12 +40,43 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
     hass.data[DOMAIN][entry.entry_id] = coordinator
 
+
+    async def handle_increase_speed(call):
+        """Handle the increase speed service."""
+        entity_id = call.data["entity_id"]
+        entity = hass.data[DOMAIN][entry.entry_id].get_entity(entity_id)
+        if entity and isinstance(entity, AtombergFanEntity):
+            await entity.async_increase_speed()
+
+    async def handle_decrease_speed(call):
+        """Handle the decrease speed service."""
+        entity_id = call.data["entity_id"]
+        entity = hass.data[DOMAIN][entry.entry_id].get_entity(entity_id)
+        if entity and isinstance(entity, AtombergFanEntity):
+            await entity.async_decrease_speed()
+
+    hass.services.async_register(
+        DOMAIN,
+        "increase_speed",
+        handle_increase_speed,
+        schema=vol.Schema({vol.Required("entity_id"): cv.entity_id}),
+    )
+
+    hass.services.async_register(
+        DOMAIN,
+        "decrease_speed",
+        handle_decrease_speed,
+        schema=vol.Schema({vol.Required("entity_id"): cv.entity_id}),
+    )
+
     try:
         await udp_listener.start()
     except Exception:
         raise ConfigEntryError("Failed to start udp listener.")  # noqa: B904
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+
 
     return True
 
