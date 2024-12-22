@@ -30,7 +30,7 @@ TIMER_MAPPING = [
     (1, "1 hour"),
     (2, "2 hours"),
     (3, "3 hours"),
-    (4, "4 hours")
+    (4, "4 hours"),
     (6, "6 hours"),
 ]
 
